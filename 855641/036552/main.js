@@ -12,7 +12,7 @@ const urls = {
     subLL : dataDirectory + 'subLL.json'
 }
 
-let PM = tMap.PageManager('div#app', 'Db', '4-5-1-5-1-b', 'div#header', 'div#footer', 700, 700);
+let PM = tMap.PageManager('div#app', 'Db', '2-5-1-b', 'div#header', 'div#footer', 700, 700);
 
 let DM = tMap.DataManager();
 
@@ -20,11 +20,11 @@ let SM = tMap.StateManager();
 
 let mainMap = tMap.BubbleMap(PM.panel1.c, PM.panel1.w, PM.panel1.h)
     //.setTooltip(d=>null)
-    .setTooltipChart((t,d)=>null)
+    //.setTooltipChart((t,d)=>null)
     .setBubbleClick(selectMainTopic)
     .addDefaultText('Loading...', 2, true)
     .setMargin([40,10,10,10])
-    .toggleButton('TR', 'Test', ()=>{console.log('button test')})
+   // .toggleButton('TR', 'Test', ()=>{console.log('button test')})
     .toggleTitle('Topic Map').setMinimumTextSize(2);
 let wordcloud = tMap.WordCloud(PM.panel3.c, PM.panel3.w, PM.panel3.h)
     .addDefaultText('Click on a bubble to see more labels.', 1, true)
@@ -45,7 +45,7 @@ let subMap = tMap.BubbleMap(PM.panel2.c, PM.panel2.w, PM.panel2.h)
     .setBubbleClick(selectSubTopic)
     .addDefaultText('Click on a bubble to see more topics.')
     .setMargin([40,10,10,10])
-    .toggleButton('TR', 'Test', ()=>{console.log('button test')})
+   // .toggleButton('TR', 'Test', ()=>{console.log('button test')})
     .toggleTitle('Topic Map');
 
 // let sumByMonth = tMap.dateConverter('%d/%m/%y', '%Y-%m'),
@@ -76,7 +76,7 @@ let tableTooltipChart = (t,d)=>{
 }
 let table = tMap.DocTable(PM.panel4.c, PM.panel4.w, PM.panel4.h)
     .addDefaultText('Click on a bubble to see the topic top documents.',1,true)
-    .toggleTitle('Top Documents')
+    .toggleTitle('Top profiles')
     .setColumnsInfo([
         {title:'Title',accessor:d=>d.docData.Pos,tooltip:tableTooltip,click:selectDoc},
         {title:'Bio',accessor:d=>d.docData.Bio,tooltip:tableTooltip,click:selectDoc}      
@@ -155,7 +155,7 @@ function highlightFromLabelSearch(){
     table.highlightDocs(docIds);
 }
 
-let menu = tMap.Menu(PM.control4.c,PM.control4.h)
+let menu = tMap.Menu(PM.control2.c,PM.control2.h)
     .addShare(()=>{
         return SM.buildURL();
     })
@@ -168,11 +168,41 @@ PM.watch({
     panel2: subMap,
     panel3: wordcloud,
    // panel4: trend,
-    panel5: table,
+    panel4: table,
     control1: search,
    // control3: dropdown,
-    control4: menu
+    control2: menu
 })
+
+// // parse url for states
+// function parseURL(){
+//     SM.parseURL();
+//     if(SM.state('mainTopic')!==null){
+//         selectMainTopic(null, DM.getTopicMainMap(SM.state('mainTopic')));
+//         if(SM.state('subTopic')!==null){
+//             selectSubTopic(null, DM.getTopicSubMap(SM.state('subTopic')));
+//         }
+//     }
+//     if(SM.state('search')!==null){
+//         search.setValue(SM.state('search'))
+//     }
+// }
+
+// parse url for states
+function parseURL(){
+    SM.parseURL();
+    if(SM.state('subTopic')!==null){
+        mainMap.selectBubble(SM.state('mainTopic'));
+        subMap.render(DM.getSubMap(SM.state('mainTopic')));
+        selectSubTopic(null, DM.getTopicSubMap(SM.state('subTopic')));
+    } else if(SM.state('mainTopic')!==null){
+        selectMainTopic(null, DM.getTopicMainMap(SM.state('mainTopic')));
+    }
+    if(SM.state('search')!==null){
+        search.setValue(SM.state('search'))
+    }
+}
+
 
 DM.loadAndProcessDataFromUrls(urls).then(()=>{
     console.log(DM.data);
@@ -201,4 +231,6 @@ DM.loadAndProcessDataFromUrls(urls).then(()=>{
                     .render(DM.getSubLLData().map(d=>{return {x:d.iter,y:d.LL}}))
             }
         ])
+        parseURL()
+        
 })
