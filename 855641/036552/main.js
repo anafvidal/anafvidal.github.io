@@ -46,7 +46,7 @@ let subMap = tMap.BubbleMap(PM.panel2.c, PM.panel2.w, PM.panel2.h)
     .addDefaultText('Click on a bubble to see more topics.')
     .setMargin([40,10,10,10])
    // .toggleButton('TR', 'Test', ()=>{console.log('button test')})
-    .toggleTitle('Topic Map');
+    .toggleTitle('Subtopic Map');
 
 // let sumByMonth = tMap.dateConverter('%d/%m/%y', '%Y-%m'),
 //     sumByQuarter = tMap.dateConverter('%d/%m/%y', '%Y-%q'),
