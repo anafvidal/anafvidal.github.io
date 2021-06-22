@@ -1,0 +1,2 @@
+User-agent: *
+Disallow: /98465498795468/
